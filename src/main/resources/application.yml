@@ -1,0 +1,92 @@
+server:
+  port: 8080
+
+spring:
+  application.name: gateway-service
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8181/realms/is-order-processing/protocol/openid-connect/certs
+
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      discovery:
+        register: true
+        service-name: gateway-service
+
+    gateway:
+      routes:
+        - id: user-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/users/**
+
+        - id: product-service-products
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/products/**
+        - id: product-service-categories
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/categories/**
+        - id: product-service-stocks
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/stocks/**
+        - id: product-service-images
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/images/**
+
+        - id: order-service
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/orders/**
+
+        - id: print-service-prices
+          uri: http://localhost:8084
+          predicates:
+            - Path=/api/print-prices/**
+        - id: print-service-types
+          uri: http://localhost:8084
+          predicates:
+            - Path=/api/print-types/**
+
+      httpclient:
+        response-timeout: 120s
+
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOriginPatterns: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - PATCH
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
+
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
+
+management:
+  endpoint:
+    health:
+      show-details: always
+
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway
+
+base-url:
+  http://localhost:8082
+frontend-url:
+  http://localhost:3000
