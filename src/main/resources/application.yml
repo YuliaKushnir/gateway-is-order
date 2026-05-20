@@ -2,7 +2,10 @@ server:
   port: 8080
 
 spring:
-  application.name: gateway-service
+  application:
+    name: gateway-service
+  main:
+    web-application-type: reactive
 
   security:
     oauth2:
@@ -21,38 +24,38 @@ spring:
     gateway:
       routes:
         - id: user-service
-          uri: http://localhost:8082
+          uri: http://${USER_SERVICE_HOST:localhost}:${USER_SERVICE_PORT:8082}
           predicates:
             - Path=/api/users/**
 
         - id: product-service-products
-          uri: http://localhost:8081
+          uri: http://${PRODUCT_SERVICE_HOST:localhost}:${PROSUCT_SERVICE_PORT:8081}
           predicates:
             - Path=/api/products/**
         - id: product-service-categories
-          uri: http://localhost:8081
+          uri: http://${PRODUCT_SERVICE_HOST:localhost}:${PROSUCT_SERVICE_PORT:8081}
           predicates:
             - Path=/api/categories/**
         - id: product-service-stocks
-          uri: http://localhost:8081
+          uri: http://${PRODUCT_SERVICE_HOST:localhost}:${PROSUCT_SERVICE_PORT:8081}
           predicates:
             - Path=/api/stocks/**
         - id: product-service-images
-          uri: http://localhost:8081
+          uri: http://${PRODUCT_SERVICE_HOST:localhost}:${PROSUCT_SERVICE_PORT:8081}
           predicates:
             - Path=/api/images/**
 
         - id: order-service
-          uri: http://localhost:8083
+          uri: http://${ORDER_SERVICE_HOST:localhost}:${ORDER_SERVICE_PORT:8083}
           predicates:
             - Path=/api/orders/**
 
         - id: print-service-prices
-          uri: http://localhost:8084
+          uri: http://${PRINT_SERVICE_HOST:localhost}:${PRINT_SERVICE_PORT:8084}
           predicates:
             - Path=/api/print-prices/**
         - id: print-service-types
-          uri: http://localhost:8084
+          uri: http://${PRINT_SERVICE_HOST:localhost}:${PRINT_SERVICE_PORT:8084}
           predicates:
             - Path=/api/print-types/**
 
@@ -85,6 +88,10 @@ management:
     web:
       exposure:
         include: health,info,gateway
+#base-url:
+#  http://localhost:8082
+#frontend-url:
+#  http://localhost:3000
 
 base-url:
   http://localhost:8082
