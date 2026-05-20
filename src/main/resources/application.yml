@@ -11,7 +11,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          jwk-set-uri: http://localhost:8181/realms/is-order-processing/protocol/openid-connect/certs
+          issuer-uri: http://${KEYCLOAK_HOST:keycloak}:${KEYCLOAK_PORT:8181}/realms/cloud-realm
 
   cloud:
     consul:
@@ -29,19 +29,19 @@ spring:
             - Path=/api/users/**
 
         - id: product-service-products
-          uri: http://${PRODUCT_SERVICE_HOST:localhost}:${PROSUCT_SERVICE_PORT:8081}
+          uri: http://${PRODUCT_SERVICE_HOST:localhost}:${PRODUCT_SERVICE_PORT:8081}
           predicates:
             - Path=/api/products/**
         - id: product-service-categories
-          uri: http://${PRODUCT_SERVICE_HOST:localhost}:${PROSUCT_SERVICE_PORT:8081}
+          uri: http://${PRODUCT_SERVICE_HOST:localhost}:${PRODUCT_SERVICE_PORT:8081}
           predicates:
             - Path=/api/categories/**
         - id: product-service-stocks
-          uri: http://${PRODUCT_SERVICE_HOST:localhost}:${PROSUCT_SERVICE_PORT:8081}
+          uri: http://${PRODUCT_SERVICE_HOST:localhost}:${PRODUCT_SERVICE_PORT:8081}
           predicates:
             - Path=/api/stocks/**
         - id: product-service-images
-          uri: http://${PRODUCT_SERVICE_HOST:localhost}:${PROSUCT_SERVICE_PORT:8081}
+          uri: http://${PRODUCT_SERVICE_HOST:localhost}:${PRODUCT_SERVICE_PORT:8081}
           predicates:
             - Path=/api/images/**
 
@@ -88,12 +88,11 @@ management:
     web:
       exposure:
         include: health,info,gateway
+
 #base-url:
 #  http://localhost:8082
 #frontend-url:
 #  http://localhost:3000
 
-base-url:
-  http://localhost:8082
-frontend-url:
-  http://localhost:3000
+webclient-url: http://user-service:8082
+frontend-url: http://frontend:80
