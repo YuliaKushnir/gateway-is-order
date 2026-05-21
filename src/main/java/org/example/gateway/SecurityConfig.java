@@ -15,6 +15,7 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
+import org.springframework.web.server.WebFilter;
 
 import java.util.Arrays;
 import java.util.List;
@@ -24,9 +25,6 @@ import java.util.Map;
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
 public class SecurityConfig {
-
-    @Value("${frontend-url}")
-    String frontendUrl;
 
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
@@ -66,8 +64,7 @@ public class SecurityConfig {
         config.setAllowedOrigins(List.of("*"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-User-ID", "Accept", "Origin"));
-        config.setAllowCredentials(false);
-//        config.setAllowCredentials(true);
+        config.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/api/**", config);
         return source;
@@ -76,6 +73,37 @@ public class SecurityConfig {
     @Bean
     public ReactiveJwtAuthenticationConverterAdapter jwtAuthenticationConverter() {
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+
+
+        converter.setJwtGrantedAuthoritiesConverter(jwt -> {
+
+            System.out.println("===== JWT DEBUG START =====");
+            System.out.println("SUB: " + jwt.getSubject());
+            System.out.println("ISSUER: " + jwt.getIssuer());
+            System.out.println("HEADERS: " + jwt.getHeaders());
+            System.out.println("CLAIMS: " + jwt.getClaims());
+            System.out.println("RESOURCE_ACCESS: " + jwt.getClaim("resource_access"));
+            System.out.println("===== JWT DEBUG END =====");
+
+            Map<String, Object> resourceAccess = jwt.getClaim("resource_access");
+            if (resourceAccess == null) {
+                return List.of();
+            }
+
+            Map<String, Object> client = (Map<String, Object>) resourceAccess.get("gateway-client");
+            if (client == null || client.get("roles") == null) {
+                return List.of();
+            }
+
+            List<String> roles = (List<String>) client.get("roles");
+
+            System.out.println("ROLES: " + roles);
+
+            return roles.stream()
+                    .map(role -> (GrantedAuthority) new SimpleGrantedAuthority(role))
+                    .toList();
+        });
+
 
         converter.setJwtGrantedAuthoritiesConverter(jwt -> {
             Map<String, Object> resourceAccess = jwt.getClaim("resource_access");
@@ -95,5 +123,29 @@ public class SecurityConfig {
         });
 
         return new ReactiveJwtAuthenticationConverterAdapter(converter);
+    }
+
+    @Bean
+    public WebFilter loggingFilter() {
+        return (exchange, chain) -> {
+            System.out.println("\n================ REQUEST ================");
+            System.out.println("METHOD: " + exchange.getRequest().getMethod());
+            System.out.println("URI: " + exchange.getRequest().getURI());
+            System.out.println("HEADERS: " + exchange.getRequest().getHeaders());
+            System.out.println("========================================\n");
+
+            return chain.filter(exchange);
+        };
+
+    }
+
+    @Bean
+    public WebFilter debugBodyFilter() {
+        return (exchange, chain) -> {
+            System.out.println("PATH: " + exchange.getRequest().getPath());
+            System.out.println("QUERY: " + exchange.getRequest().getQueryParams());
+
+            return chain.filter(exchange);
+        };
     }
 }
