@@ -94,5 +94,5 @@ management:
 #frontend-url:
 #  http://localhost:3000
 
-webclient-url: http://user-service:8082
+base-url: http://user-service:8082
 frontend-url: http://frontend:80
