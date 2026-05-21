@@ -11,7 +11,8 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://${KEYCLOAK_HOST:keycloak}:${KEYCLOAK_PORT:8181}/realms/cloud-realm
+#          issuer-uri: http://${KEYCLOAK_HOST:keycloak}:${KEYCLOAK_PORT:8181}/realms/cloud-realm
+          issuer-uri: http://34.116.235.108/realms/cloud-realm
 
   cloud:
 #    consul:
