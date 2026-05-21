@@ -14,12 +14,12 @@ spring:
           issuer-uri: http://${KEYCLOAK_HOST:keycloak}:${KEYCLOAK_PORT:8181}/realms/cloud-realm
 
   cloud:
-    consul:
-      host: localhost
-      port: 8500
-      discovery:
-        register: true
-        service-name: gateway-service
+#    consul:
+#      host: localhost
+#      port: 8500
+#      discovery:
+#        register: true
+#        service-name: gateway-service
 
     gateway:
       routes:
