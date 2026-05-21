@@ -63,10 +63,11 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of(frontendUrl));
+        config.setAllowedOrigins(List.of("*"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-User-ID", "Accept", "Origin"));
-        config.setAllowCredentials(true);
+        config.setAllowCredentials(false);
+//        config.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/api/**", config);
         return source;
@@ -82,7 +83,7 @@ public class SecurityConfig {
                 return List.of();
             }
 
-            Map<String, Object> client = (Map<String, Object>) resourceAccess.get("oauth2-pkce-client");
+            Map<String, Object> client = (Map<String, Object>) resourceAccess.get("gateway-client");
             if (client == null || client.get("roles") == null) {
                 return List.of();
             }
