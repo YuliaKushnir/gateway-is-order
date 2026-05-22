@@ -49,10 +49,8 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.POST, "/api/stocks/**").hasAnyAuthority("ROLE_MANAGER", "ROLE_ADMIN")
 
                         .pathMatchers("/actuator/**").permitAll()
-//                        .anyExchange().authenticated()
-                                .anyExchange().permitAll()
+                        .anyExchange().authenticated()
                 )
-//                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
                 .oauth2ResourceServer(oauth2 ->
                         oauth2.jwt(jwt ->
                                 jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())
@@ -82,8 +80,8 @@ public class SecurityConfig {
             if (resourceAccess == null) {
                 return List.of();
             }
+            Map<String, Object> client = (Map<String, Object>) resourceAccess.get("order-processing");
 
-            Map<String, Object> client = (Map<String, Object>) resourceAccess.get("gateway-client");
             if (client == null || client.get("roles") == null) {
                 return List.of();
             }
