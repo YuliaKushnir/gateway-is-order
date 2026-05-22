@@ -31,25 +31,26 @@ public class SecurityConfig {
         return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchange -> exchange
-                        .pathMatchers(HttpMethod.GET,
-                                "/api/products/**",
-                                "/api/categories/**",
-                                "/api/stocks/**",
-                                "/api/images/**",
-                                "/api/print-prices/**",
-                                "/api/print-types/**",
-                                "/api/users/**"
-                        ).permitAll()
-                        .pathMatchers(HttpMethod.POST, "/api/products/_list").permitAll()
-                        .pathMatchers(HttpMethod.POST, "/api/images/**").permitAll()
-                        .pathMatchers(HttpMethod.POST, "/api/users/**").permitAll()
-                        .pathMatchers(HttpMethod.POST, "/api/products/**").hasAnyAuthority("ROLE_ADMIN", "ADMIN")
-                        .pathMatchers(HttpMethod.PATCH, "/api/products/**").hasAnyAuthority("ROLE_ADMIN")
-                        .pathMatchers(HttpMethod.DELETE, "/api/products/**").hasAuthority("ROLE_ADMIN")
-                        .pathMatchers(HttpMethod.POST, "/api/stocks/**").hasAnyAuthority("ROLE_MANAGER", "ROLE_ADMIN")
-
-                        .pathMatchers("/actuator/**").permitAll()
-                        .anyExchange().authenticated()
+                                .anyExchange().permitAll()
+//                        .pathMatchers(HttpMethod.GET,
+//                                "/api/products/**",
+//                                "/api/categories/**",
+//                                "/api/stocks/**",
+//                                "/api/images/**",
+//                                "/api/print-prices/**",
+//                                "/api/print-types/**",
+//                                "/api/users/**"
+//                        ).permitAll()
+//                        .pathMatchers(HttpMethod.POST, "/api/products/_list").permitAll()
+//                        .pathMatchers(HttpMethod.POST, "/api/images/**").permitAll()
+//                        .pathMatchers(HttpMethod.POST, "/api/users/**").permitAll()
+//                        .pathMatchers(HttpMethod.POST, "/api/products/**").hasAnyAuthority("ROLE_ADMIN", "ADMIN")
+//                        .pathMatchers(HttpMethod.PATCH, "/api/products/**").hasAnyAuthority("ROLE_ADMIN")
+//                        .pathMatchers(HttpMethod.DELETE, "/api/products/**").hasAuthority("ROLE_ADMIN")
+//                        .pathMatchers(HttpMethod.POST, "/api/stocks/**").hasAnyAuthority("ROLE_MANAGER", "ROLE_ADMIN")
+//
+//                        .pathMatchers("/actuator/**").permitAll()
+//                        .anyExchange().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 ->
                         oauth2.jwt(jwt ->
