@@ -37,11 +37,13 @@ public class SecurityConfig {
                                 "/api/stocks/**",
                                 "/api/images/**",
                                 "/api/print-prices/**",
-                                "/api/print-types/**"
+                                "/api/print-types/**",
+                                "/api/users/**"
                         ).permitAll()
                         .pathMatchers(HttpMethod.POST, "/api/products/_list").permitAll()
                         .pathMatchers(HttpMethod.POST, "/api/images/**").permitAll()
-                        .pathMatchers(HttpMethod.POST, "/api/products/**").hasAnyAuthority("ROLE_ADMIN")
+                        .pathMatchers(HttpMethod.POST, "/api/users/**").permitAll()
+                        .pathMatchers(HttpMethod.POST, "/api/products/**").hasAnyAuthority("ROLE_ADMIN", "ADMIN")
                         .pathMatchers(HttpMethod.PATCH, "/api/products/**").hasAnyAuthority("ROLE_ADMIN")
                         .pathMatchers(HttpMethod.DELETE, "/api/products/**").hasAuthority("ROLE_ADMIN")
                         .pathMatchers(HttpMethod.POST, "/api/stocks/**").hasAnyAuthority("ROLE_MANAGER", "ROLE_ADMIN")
@@ -74,37 +76,6 @@ public class SecurityConfig {
     public ReactiveJwtAuthenticationConverterAdapter jwtAuthenticationConverter() {
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
 
-
-        converter.setJwtGrantedAuthoritiesConverter(jwt -> {
-
-            System.out.println("===== JWT DEBUG START =====");
-            System.out.println("SUB: " + jwt.getSubject());
-            System.out.println("ISSUER: " + jwt.getIssuer());
-            System.out.println("HEADERS: " + jwt.getHeaders());
-            System.out.println("CLAIMS: " + jwt.getClaims());
-            System.out.println("RESOURCE_ACCESS: " + jwt.getClaim("resource_access"));
-            System.out.println("===== JWT DEBUG END =====");
-
-            Map<String, Object> resourceAccess = jwt.getClaim("resource_access");
-            if (resourceAccess == null) {
-                return List.of();
-            }
-
-            Map<String, Object> client = (Map<String, Object>) resourceAccess.get("gateway-client");
-            if (client == null || client.get("roles") == null) {
-                return List.of();
-            }
-
-            List<String> roles = (List<String>) client.get("roles");
-
-            System.out.println("ROLES: " + roles);
-
-            return roles.stream()
-                    .map(role -> (GrantedAuthority) new SimpleGrantedAuthority(role))
-                    .toList();
-        });
-
-
         converter.setJwtGrantedAuthoritiesConverter(jwt -> {
             Map<String, Object> resourceAccess = jwt.getClaim("resource_access");
             if (resourceAccess == null) {
@@ -123,29 +94,5 @@ public class SecurityConfig {
         });
 
         return new ReactiveJwtAuthenticationConverterAdapter(converter);
-    }
-
-    @Bean
-    public WebFilter loggingFilter() {
-        return (exchange, chain) -> {
-            System.out.println("\n================ REQUEST ================");
-            System.out.println("METHOD: " + exchange.getRequest().getMethod());
-            System.out.println("URI: " + exchange.getRequest().getURI());
-            System.out.println("HEADERS: " + exchange.getRequest().getHeaders());
-            System.out.println("========================================\n");
-
-            return chain.filter(exchange);
-        };
-
-    }
-
-    @Bean
-    public WebFilter debugBodyFilter() {
-        return (exchange, chain) -> {
-            System.out.println("PATH: " + exchange.getRequest().getPath());
-            System.out.println("QUERY: " + exchange.getRequest().getQueryParams());
-
-            return chain.filter(exchange);
-        };
     }
 }
