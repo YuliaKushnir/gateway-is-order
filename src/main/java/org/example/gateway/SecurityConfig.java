@@ -1,21 +1,26 @@
 package org.example.gateway;
 
-import org.springframework.beans.factory.annotation.Value;
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
+import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverterAdapter;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.WebFilter;
+import reactor.netty.http.client.HttpClient;
 
 import java.util.Arrays;
 import java.util.List;
@@ -94,6 +99,25 @@ public class SecurityConfig {
         });
 
         return new ReactiveJwtAuthenticationConverterAdapter(converter);
+    }
+
+    @Bean
+    public ReactiveJwtDecoder jwtDecoder() {
+
+        HttpClient httpClient = HttpClient.create()
+                .secure(t -> t.sslContext(
+                        SslContextBuilder.forClient()
+                                .trustManager(InsecureTrustManagerFactory.INSTANCE)
+                ));
+
+        WebClient webClient = WebClient.builder()
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .build();
+
+        return NimbusReactiveJwtDecoder
+                .withIssuerLocation("https://34.116.235.108/realms/garment_print")
+                .webClient(webClient)
+                .build();
     }
 
     // Its temp - delete after
