@@ -51,6 +51,7 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.POST, "/api/products/_list").permitAll()
                         .pathMatchers(HttpMethod.POST, "/api/images/**").permitAll()
                         .pathMatchers(HttpMethod.POST, "/api/users/**").permitAll()
+                        .pathMatchers(HttpMethod.PUT, "/api/users/*/role").hasAnyAuthority("ROLE_ADMIN", "ADMIN")
                         .pathMatchers(HttpMethod.POST, "/api/products/**").hasAnyAuthority("ROLE_ADMIN", "ADMIN")
                         .pathMatchers(HttpMethod.PATCH, "/api/products/**").hasAnyAuthority("ROLE_ADMIN")
                         .pathMatchers(HttpMethod.DELETE, "/api/products/**").hasAuthority("ROLE_ADMIN")
