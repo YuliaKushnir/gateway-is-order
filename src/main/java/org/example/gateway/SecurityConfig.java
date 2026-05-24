@@ -2,8 +2,10 @@ package org.example.gateway;
 
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
@@ -36,26 +38,26 @@ public class SecurityConfig {
         return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchange -> exchange
-                                .anyExchange().permitAll()
-//                        .pathMatchers(HttpMethod.GET,
-//                                "/api/products/**",
-//                                "/api/categories/**",
-//                                "/api/stocks/**",
-//                                "/api/images/**",
-//                                "/api/print-prices/**",
-//                                "/api/print-types/**",
-//                                "/api/users/**"
-//                        ).permitAll()
-//                        .pathMatchers(HttpMethod.POST, "/api/products/_list").permitAll()
-//                        .pathMatchers(HttpMethod.POST, "/api/images/**").permitAll()
-//                        .pathMatchers(HttpMethod.POST, "/api/users/**").permitAll()
-//                        .pathMatchers(HttpMethod.POST, "/api/products/**").hasAnyAuthority("ROLE_ADMIN", "ADMIN")
-//                        .pathMatchers(HttpMethod.PATCH, "/api/products/**").hasAnyAuthority("ROLE_ADMIN")
-//                        .pathMatchers(HttpMethod.DELETE, "/api/products/**").hasAuthority("ROLE_ADMIN")
-//                        .pathMatchers(HttpMethod.POST, "/api/stocks/**").hasAnyAuthority("ROLE_MANAGER", "ROLE_ADMIN")
-//
-//                        .pathMatchers("/actuator/**").permitAll()
-//                        .anyExchange().authenticated()
+//                                .anyExchange().permitAll()
+                        .pathMatchers(HttpMethod.GET,
+                                "/api/products/**",
+                                "/api/categories/**",
+                                "/api/stocks/**",
+                                "/api/images/**",
+                                "/api/print-prices/**",
+                                "/api/print-types/**",
+                                "/api/users/**"
+                        ).permitAll()
+                        .pathMatchers(HttpMethod.POST, "/api/products/_list").permitAll()
+                        .pathMatchers(HttpMethod.POST, "/api/images/**").permitAll()
+                        .pathMatchers(HttpMethod.POST, "/api/users/**").permitAll()
+                        .pathMatchers(HttpMethod.POST, "/api/products/**").hasAnyAuthority("ROLE_ADMIN", "ADMIN")
+                        .pathMatchers(HttpMethod.PATCH, "/api/products/**").hasAnyAuthority("ROLE_ADMIN")
+                        .pathMatchers(HttpMethod.DELETE, "/api/products/**").hasAuthority("ROLE_ADMIN")
+                        .pathMatchers(HttpMethod.POST, "/api/stocks/**").hasAnyAuthority("ROLE_MANAGER", "ROLE_ADMIN")
+
+                        .pathMatchers("/actuator/**").permitAll()
+                        .anyExchange().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 ->
                         oauth2.jwt(jwt ->
@@ -120,26 +122,6 @@ public class SecurityConfig {
                 .build();
     }
 
-    // Its temp - delete after
-    @Bean
-    public WebFilter logHeadersFilter() {
-        return (exchange, chain) -> {
 
-            System.out.println("===== REQUEST HEADERS =====");
 
-            exchange.getRequest().getHeaders().forEach((key, value) -> {
-                System.out.println(key + " : " + value);
-            });
-
-            String authHeader = exchange.getRequest()
-                    .getHeaders()
-                    .getFirst("Authorization");
-
-            System.out.println("Authorization Header: " + authHeader);
-
-            System.out.println("===========================");
-
-            return chain.filter(exchange);
-        };
-    }
 }
